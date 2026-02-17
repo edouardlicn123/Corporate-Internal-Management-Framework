@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-bs-theme="{{ current_user.theme|default('default') }}">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+    <meta name="description" content="FFE 项目跟进系统 - 酒店家具项目管理与海运费用计算工具">
+    <meta name="robots" content="noindex, nofollow">
+    <meta name="format-detection" content="telephone=no">
+    <meta http-equiv="X-Frame-Options" content="DENY">
+
+    <title>{% block title %}FFE 项目跟进系统{% endblock %}</title>
+
+    {% include "includes/style.html" %}
+
+    {% block head_extra %}{% endblock %}
+</head>
+
+<body>
+
+    {% if show_nav|default(true) %}
+        {% include "includes/nav.html" %}
+    {% endif %}
+
+    {% if show_header|default(true) %}
+        {% include "includes/header.html" %}
+    {% endif %}
+
+    <main class="container py-4 py-md-5">
+        {% block content %}{% endblock %}
+    </main>
+
+    {% include "includes/footer.html" %}
+
+    {% include "includes/toast_messages.html" %}
+
+    {% include "includes/js.html" %}
+
+    {% block scripts %}{% endblock %}
+
+</body>
+</html>

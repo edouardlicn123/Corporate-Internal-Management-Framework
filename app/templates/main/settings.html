@@ -1,0 +1,173 @@
+{% extends "base.html" %}
+
+{% set show_nav = true %}
+{% set show_header = false %}
+
+{% block title %}设置 - FFE 项目跟进系统{% endblock %}
+
+{% block content %}
+<div class="container py-4 py-md-5">
+            <!-- flash消息但隐藏，转toast -->
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    <div class="login-message-container mx-auto mt-auto" style="display: none;">
+                        {% for category, message in messages %}
+                            <div class="alert alert-{{ category }} alert-dismissible fade show mb-0" role="alert">
+                                {{ message }}
+                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <!-- 无消息时占位，确保布局稳定 -->
+                    <div class="mt-auto"></div>
+                {% endif %}
+            {% endwith %}
+  <div class="row justify-content-center">
+    <div class="col-12 col-md-10 col-lg-8">
+
+      <h2 class="mb-4 fw-semibold settings-title text-center">系统设置</h2>
+
+      <div class="card shadow-sm border-0 settings-card">
+        <!-- 去掉 accordion-flush，使用普通 accordion，让每个 item 有独立边框，高度计算更可靠 -->
+        <div class="accordion" id="settingsAccordion">
+
+          <!-- 分区1：个人信息编辑 -->
+          <div class="accordion-item">
+            <h2 class="accordion-header">
+              <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseProfile">
+                个人信息
+              </button>
+            </h2>
+            <div id="collapseProfile" class="accordion-collapse collapse show" data-bs-parent="#settingsAccordion">
+              <div class="accordion-body px-4 py-3">
+                <form method="post">
+                  {{ profile_form.hidden_tag() }}
+
+                  <div class="mb-3">
+                    {{ profile_form.nickname.label(class="form-label fw-medium") }}
+                    {{ profile_form.nickname(class="form-control", placeholder="用于仪表盘、项目成员列表等处的友好显示名称，可留空") }}
+                    <div class="form-text text-muted small">
+                      仪表盘、项目列表等处优先显示此名称，未设置时显示用户名
+                    </div>
+                  </div>
+
+                  <div class="mb-4">
+                    {{ profile_form.email.label(class="form-label fw-medium") }}
+                    {{ profile_form.email(class="form-control", placeholder="用于密码重置、系统通知、找回账号，可留空") }}
+                  </div>
+
+                  <button type="submit" name="submit_profile" class="btn btn-info mt-2 settings-btn">
+                    保存个人信息
+                  </button>
+                </form>
+              </div>
+            </div>
+          </div>
+
+          <!-- 分区2：偏好与通知设置 -->
+          <div class="accordion-item">
+            <h2 class="accordion-header">
+              <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapsePreferences">
+                偏好与通知设置
+              </button>
+            </h2>
+            <div id="collapsePreferences" class="accordion-collapse collapse" data-bs-parent="#settingsAccordion">
+              <div class="accordion-body px-4 py-3">
+                <form method="post">
+                  {{ pref_form.hidden_tag() }}
+
+                  <div class="mb-3">
+                    {{ pref_form.theme.label(class="form-label fw-medium") }}
+                    {{ pref_form.theme(class="form-select") }}
+                    <div class="form-text text-muted small">
+                      选择你喜欢的界面风格（部分主题需刷新页面生效）
+                    </div>
+                  </div>
+
+                  <div class="mb-3 form-check form-switch">
+                    {{ pref_form.notifications(class="form-check-input", id="notificationsSwitch") }}
+                    {{ pref_form.notifications.label(class="form-check-label", for="notificationsSwitch") }}
+                    <div class="form-text text-muted small">
+                      开启后可接收新项目分配、任务提醒、系统消息等通知
+                    </div>
+                  </div>
+
+                  <div class="mb-4">
+                    {{ pref_form.language.label(class="form-label fw-medium") }}
+                    {{ pref_form.language(class="form-select") }}
+                  </div>
+
+                  <button type="submit" name="submit_preferences" class="btn btn-info mt-2 settings-btn">
+                    保存偏好设置
+                  </button>
+                </form>
+              </div>
+            </div>
+          </div>
+
+          <!-- 分区3：修改密码 -->
+          <div class="accordion-item">
+            <h2 class="accordion-header">
+              <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapsePassword">
+                修改密码（敏感操作）
+              </button>
+            </h2>
+            <div id="collapsePassword" class="accordion-collapse collapse" data-bs-parent="#settingsAccordion">
+              <div class="accordion-body px-4 py-3">
+                <div class="alert alert-warning small mb-4 rounded-3 shadow-sm password-warning" role="alert">
+                  <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                  修改密码后系统将<strong>自动登出</strong>，请使用新密码重新登录。
+                </div>
+
+                <form method="post">
+                  {{ pwd_form.hidden_tag() }}
+
+                  <div class="mb-3">
+                    {{ pwd_form.current_password.label(class="form-label fw-medium") }}
+                    {{ pwd_form.current_password(class="form-control") }}
+                  </div>
+
+                  <div class="mb-3">
+                    {{ pwd_form.new_password.label(class="form-label fw-medium") }}
+                    {{ pwd_form.new_password(class="form-control") }}
+                    <div class="form-text text-muted small">
+                      至少8位，建议包含大小写字母、数字和符号
+                    </div>
+                  </div>
+
+                  <div class="mb-4">
+                    {{ pwd_form.confirm_password.label(class="form-label fw-medium") }}
+                    {{ pwd_form.confirm_password(class="form-control") }}
+                  </div>
+
+                  <button type="submit" name="submit_password" class="btn btn-info mt-2 settings-btn">
+                    修改密码并重新登录
+                  </button>
+                </form>
+              </div>
+            </div>
+          </div>
+
+        </div> <!-- accordion end -->
+      </div> <!-- card end -->
+
+      <div class="mt-5 text-center text-muted small admin-contact">
+        如需更多个性化设置、权限调整或遇到问题，请联系系统管理员。
+      </div>
+
+      <!-- 新增：底部 spacer 强制页面有足够高度，便于滚动测试 -->
+      <div style="height: 200px;"></div>
+
+    </div> <!-- col end -->
+  </div> <!-- row end -->
+</div>
+
+<!-- 强制覆盖可能的外层 overflow 限制（临时调试用） -->
+<style>
+  html, body, .container, .row, .col {
+    overflow: visible !important;
+    height: auto !important;
+  }
+</style>
+{% endblock %}

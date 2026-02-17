@@ -1,0 +1,183 @@
+{% extends "base.html" %}
+
+{% set show_nav = true %}
+{% set show_header = false %}
+
+{% block title %}个人中心 - FFE 项目跟进系统{% endblock %}
+
+{% block content %}
+<div class="container py-4 py-md-5">
+            <!-- flash消息但隐藏，转toast -->
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    <div class="login-message-container mx-auto mt-auto" style="display: none;">
+                        {% for category, message in messages %}
+                            <div class="alert alert-{{ category }} alert-dismissible fade show mb-0" role="alert">
+                                {{ message }}
+                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <!-- 无消息时占位，确保布局稳定 -->
+                    <div class="mt-auto"></div>
+                {% endif %}
+            {% endwith %}
+  <div class="row justify-content-center">
+    <div class="col-12 col-md-10 col-lg-8">  <!-- 宽度削减约三分之一 + 居中 -->
+
+      <h2 class="mb-4 fw-semibold profile-title text-center">个人中心</h2>
+
+      <div class="card shadow-sm border-0 profile-card">
+        <!-- 去掉 accordion-flush，使用普通 accordion，让每个 item 有独立边框，高度计算更可靠 -->
+        <div class="accordion" id="profileAccordion">
+
+          <!-- 分区1：基本信息 -->
+          <div class="accordion-item">
+            <h2 class="accordion-header">
+              <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseBasic">
+                基本信息
+              </button>
+            </h2>
+            <div id="collapseBasic" class="accordion-collapse collapse show" data-bs-parent="#profileAccordion">
+              <div class="accordion-body px-4 py-3">
+                <h4 class="mb-3 profile-name text-center">
+                  {{ current_user.nickname or current_user.username }}
+                </h4>
+                <p class="text-muted small mb-4 text-center profile-role">
+                  {% if current_user.is_admin %}
+                    <span class="badge bg-danger role-badge">系统管理员</span>
+                  {% else %}
+                    <span class="badge bg-secondary role-badge">普通用户</span>
+                  {% endif %}
+                </p>
+
+                <dl class="row g-3 profile-info">
+                  <dt class="col-sm-4 text-muted fw-medium">登录账号</dt>
+                  <dd class="col-sm-8">{{ current_user.username }}</dd>
+
+                  <dt class="col-sm-4 text-muted fw-medium">显示昵称</dt>
+                  <dd class="col-sm-8">{{ current_user.nickname or '未设置' }}</dd>
+
+                  <dt class="col-sm-4 text-muted fw-medium">邮箱地址</dt>
+                  <dd class="col-sm-8">{{ current_user.email or '未设置' }}</dd>
+
+                  <dt class="col-sm-4 text-muted fw-medium">账号创建时间</dt>
+                  <dd class="col-sm-8">{{ current_user.created_at.strftime('%Y-%m-%d %H:%M') }}</dd>
+
+                  <dt class="col-sm-4 text-muted fw-medium">最后登录时间</dt>
+                  <dd class="col-sm-8">
+                    {{ current_user.last_login_at.strftime('%Y-%m-%d %H:%M:%S') if current_user.last_login_at else '首次登录' }}
+                  </dd>
+                </dl>
+              </div>
+            </div>
+          </div>
+
+          <!-- 分区2：偏好设置 -->
+          <div class="accordion-item">
+            <h2 class="accordion-header">
+              <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapsePreferences">
+                偏好设置
+              </button>
+            </h2>
+            <div id="collapsePreferences" class="accordion-collapse collapse" data-bs-parent="#profileAccordion">
+              <div class="accordion-body px-4 py-3">
+                <dl class="row g-3 profile-preferences">
+                  <dt class="col-sm-4 text-muted fw-medium">界面主题</dt>
+                  <dd class="col-sm-8">
+                    {% if current_user.theme == 'light' %}浅色模式（默认）
+                    {% elif current_user.theme == 'dark' %}深色模式
+                    {% elif current_user.theme == 'auto' %}跟随系统
+                    {% else %}未设置{% endif %}
+                  </dd>
+
+                  <dt class="col-sm-4 text-muted fw-medium">系统通知</dt>
+                  <dd class="col-sm-8">
+                    {% if current_user.notifications_enabled %}
+                      <span class="badge bg-success notification-badge">已开启</span>
+                    {% else %}
+                      <span class="badge bg-secondary notification-badge">已关闭</span>
+                    {% endif %}
+                  </dd>
+
+                  <dt class="col-sm-4 text-muted fw-medium">首选语言</dt>
+                  <dd class="col-sm-8">
+                    {% if current_user.preferred_language == 'zh' %}中文（简体）
+                    {% elif current_user.preferred_language == 'en' %}English
+                    {% else %}未设置{% endif %}
+                  </dd>
+                </dl>
+              </div>
+            </div>
+          </div>
+
+          <!-- 分区3：安全状态 -->
+          <div class="accordion-item">
+            <h2 class="accordion-header">
+              <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseSecurity">
+                安全状态
+              </button>
+            </h2>
+            <div id="collapseSecurity" class="accordion-collapse collapse" data-bs-parent="#profileAccordion">
+              <div class="accordion-body px-4 py-3">
+                <dl class="row g-3 profile-security">
+                  <dt class="col-sm-4 text-muted fw-medium">账号状态</dt>
+                  <dd class="col-sm-8">
+                    {% if current_user.is_active %}
+                      <span class="badge bg-success status-badge">正常</span>
+                    {% else %}
+                      <span class="badge bg-danger status-badge">已禁用</span>
+                    {% endif %}
+                  </dd>
+
+                  <dt class="col-sm-4 text-muted fw-medium">是否锁定</dt>
+                  <dd class="col-sm-8">
+                    {% if current_user.is_locked() %}
+                      <span class="badge bg-danger lock-badge">临时锁定中</span>
+                    {% else %}
+                      <span class="badge bg-success lock-badge">未锁定</span>
+                    {% endif %}
+                  </dd>
+
+                  <dt class="col-sm-4 text-muted fw-medium">连续登录失败次数</dt>
+                  <dd class="col-sm-8">
+                    {{ current_user.failed_login_attempts }}
+                    {% if current_user.failed_login_attempts >= 5 %}
+                      <small class="text-danger ms-2 failed-attempts">（已触发锁定机制）</small>
+                    {% endif %}
+                  </dd>
+                </dl>
+              </div>
+            </div>
+          </div>
+
+        </div> <!-- accordion end -->
+      </div> <!-- card end -->
+
+      <!-- 操作按钮 -->
+      <div class="text-center mt-5 profile-actions">
+        <a href="{{ url_for('main.settings') }}" class="btn btn-info btn-lg px-5 rounded-pill shadow-sm edit-btn">
+          修改个人信息 / 偏好 / 密码
+        </a>
+      </div>
+
+      <div class="mt-5 text-center text-muted small admin-help">
+        如需重置密码、修改权限或其他帮助，请联系系统管理员。
+      </div>
+
+      <!-- 新增：底部 spacer 强制页面有足够高度，便于滚动测试 -->
+      <div style="height: 200px;"></div>
+
+    </div> <!-- col end -->
+  </div> <!-- row end -->
+</div>
+
+<!-- 强制覆盖可能的外层 overflow 限制（临时调试用） -->
+<style>
+  html, body, .container, .row, .col {
+    overflow: visible !important;
+    height: auto !important;
+  }
+</style>
+{% endblock %}
